@@ -261,8 +261,8 @@ MonoBehaviour:
   moveSpeed: 2
   animator: {fileID: 298893715}
   rigidBody: {fileID: 298893714}
-  startPosition: {x: 0, y: 0, z: 0}
-  finalPosition: {x: 0, y: 0, z: 0}
+  startPosition: {x: 0, y: 0}
+  finalPosition: {x: 0, y: 0}
   boundariesDistance: 5
 --- !u!61 &298893719
 BoxCollider2D:
@@ -13294,6 +13294,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 7545048601100557330, guid: 8ddeb8e1201414dab8312941b7d8d22a,
+        type: 3}
+      propertyPath: weapon
+      value: 
+      objectReference: {fileID: 842362463}
     - target: {fileID: 7545048601100557335, guid: 8ddeb8e1201414dab8312941b7d8d22a,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -13349,10 +13354,5 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7545048601100557330, guid: 8ddeb8e1201414dab8312941b7d8d22a,
-        type: 3}
-      propertyPath: weapon
-      value: 
-      objectReference: {fileID: 842362463}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8ddeb8e1201414dab8312941b7d8d22a, type: 3}
