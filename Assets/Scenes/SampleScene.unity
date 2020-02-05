@@ -137,7 +137,7 @@ GameObject:
   - component: {fileID: 298893720}
   m_Layer: 0
   m_Name: Slime
-  m_TagString: Untagged
+  m_TagString: Enemies
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -150,7 +150,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 298893713}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -261,9 +261,9 @@ MonoBehaviour:
   moveSpeed: 2
   animator: {fileID: 298893715}
   rigidBody: {fileID: 298893714}
-  startPosition: {x: 0, y: 0}
+  originPosition: {x: 0, y: 0}
   finalPosition: {x: 0, y: 0}
-  boundariesDistance: 5
+  boundariesDistance: 7
 --- !u!61 &298893719
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -297,10 +297,10 @@ CapsuleCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 298893713}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -11959,7 +11959,7 @@ CapsuleCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1657208129}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 1
@@ -13294,11 +13294,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 7545048601100557330, guid: 8ddeb8e1201414dab8312941b7d8d22a,
-        type: 3}
-      propertyPath: weapon
-      value: 
-      objectReference: {fileID: 842362463}
     - target: {fileID: 7545048601100557335, guid: 8ddeb8e1201414dab8312941b7d8d22a,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -13353,6 +13348,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7545048601100557330, guid: 8ddeb8e1201414dab8312941b7d8d22a,
+        type: 3}
+      propertyPath: weapon
+      value: 
+      objectReference: {fileID: 842362463}
+    - target: {fileID: 7545048601100557331, guid: 8ddeb8e1201414dab8312941b7d8d22a,
+        type: 3}
+      propertyPath: m_UsedByEffector
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7545048601100557334, guid: 8ddeb8e1201414dab8312941b7d8d22a,
+        type: 3}
+      propertyPath: m_Simulated
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8ddeb8e1201414dab8312941b7d8d22a, type: 3}
