@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Controllers.EnemyControllers;
 
 namespace Controllers {
     public class CameraController2D : MonoBehaviour {
