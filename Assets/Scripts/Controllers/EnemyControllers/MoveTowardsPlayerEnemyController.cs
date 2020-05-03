@@ -41,60 +41,46 @@ namespace Controllers.EnemyControllers {
         }
 
         public override void Move(){
-//            rigidBody.MovePosition(Vector2.MoveTowards(this.gameObject.transform.position, playerPosition, moveSpeed * Time.fixedDeltaTime));
-//            this.transform.position = Vector2.MoveTowards(this.gameObject.transform.position, playerPosition, moveSpeed * Time.fixedDeltaTime);
-            rigidBody.velocity = moveDirection * moveSpeed;
-            animator.SetFloat("Speed", moveDirection.magnitude);
-        }
-
-//        public override void TakeDamage(int damage, Vector2 orignatorsPosition){
-//
-//        }
-
-        void OnCollisionEnter2D(Collision2D collision) {
-//            Debug.Log(this.ToString() + "-collision-enter: " + collision.gameObject.name + "/tag:" + collision.gameObject.tag);
-            if(collision.gameObject.tag == TagConstants.PLAYER){
-                PlayerController playerController = collision.gameObject.GetComponent<PlayerController>();
-                playerController.TakeDamage(contactDamage, moveDirection);
-//                damageVelocity = moveDirection * -1;
-//                Debug.Log(this + "-Damage Velocity = " + damageVelocity);
-//                rigidBody.AddForce(damageVelocity, ForceMode2D.Impulse);
-                StartCoroutine(PauseMovement(2));
-//                OnContact();
+            if(!tookDamage) {
+                rigidBody.velocity = moveDirection * moveSpeed;
+                animator.SetFloat("Speed", moveDirection.magnitude);
             }
         }
 
         public void CheckDirection(){
-//            moveDirection = Vector2.zero;
-
             Vector2 currentPosition = this.gameObject.transform.position;
-            float angle = AngleUtility.FindAngle(playerPosition.y-currentPosition.y, playerPosition.x-currentPosition.x);
+            moveDirection = AngleUtility.FindDirectionBetween2Points(playerPosition, currentPosition);
 
-            if (angle > 315.1 || angle < 45) {
-                moveDirection = Vector2.right;
-            } else if (angle > 45.1 && angle < 135) {
-                moveDirection = Vector2.up;
-            } else if (angle > 135.1 && angle < 225) {
-                moveDirection = Vector2.left;
-            } else if (angle > 225.1 && angle < 315) {
-                moveDirection = Vector2.down;
-            }
-//            Debug.Log("Move Direction: " + moveDirection);
             if (moveDirection != Vector2.zero) {
                 animator.SetFloat("Horizontal", moveDirection.x);
                 animator.SetFloat("Vertical", moveDirection.y);
             }
         }
 
-        public override void OnContact(){
-            Debug.Log("OnContact");
-            aggroTriggerObject.SetActive(!aggroTriggerObject.activeSelf);
+        public override IEnumerator PauseMovement(float seconds){
+            yield return base.PauseMovement(seconds);
+            aggroTriggerObject.SetActive(true);
         }
 
-        public override IEnumerator PauseMovement(int seconds){
-            yield return new WaitForSeconds(seconds);
-            aggroTriggerObject.SetActive(!aggroTriggerObject.activeSelf);
-            FindDirection();
+        public override void TakeDamage(int damage, Vector2 attackDirection){
+            base.TakeDamage(damage, attackDirection);
+            StartCoroutine(PauseMovement(0.5f));
+        }
+
+        public override void MoveDirectionToZero(){
+            base.MoveDirectionToZero();
+            aggroTriggerObject.SetActive(false);
+        }
+
+        void OnCollisionEnter2D(Collision2D collision) {
+            if(collision.gameObject.tag == TagConstants.PLAYER){
+                MoveDirectionToZero();
+                PlayerController playerController = collision.gameObject.GetComponent<PlayerController>();
+                playerController.TakeDamage(contactDamage, Vector2.zero);
+                StartCoroutine(PauseMovement(0.5f));
+            } else if(collision.gameObject.tag == TagConstants.BOUNDARIES && tookDamage){
+                MoveDirectionToZero();
+            }
         }
     }
 }

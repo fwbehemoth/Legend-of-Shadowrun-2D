@@ -5,7 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - Boundaries
-  - Enemies
+  - Weapon
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -16,9 +17,9 @@ TagManager:
   - 
   - 
   - Boundaries
-  - 
-  - 
-  - 
+  - Enemies
+  - Player
+  - Weapons
   - 
   - 
   - 

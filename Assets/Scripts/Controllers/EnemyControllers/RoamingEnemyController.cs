@@ -27,8 +27,6 @@ namespace Controllers.EnemyControllers {
         public override void Move(){
             if(!isStopped) {
                 rigidBody.MovePosition(Vector2.MoveTowards(this.gameObject.transform.position, finalPosition, moveSpeed * Time.fixedDeltaTime));
-//                this.transform.position = Vector2.MoveTowards(this.gameObject.transform.position, finalPosition, moveSpeed * Time.fixedDeltaTime);
-//                rigidBody.velocity = moveDirection * moveSpeed;
             }
 
             if(Vector2.Distance(rigidBody.position, finalPosition) <= 0.1f){
@@ -42,10 +40,6 @@ namespace Controllers.EnemyControllers {
                 animator.SetFloat("Speed", moveDirection.magnitude);
             }
         }
-
-//        public override void TakeDamage(int damage, Vector2 orignatorsPosition){
-//
-//        }
 
         public override void FindDirection(){
             Vector2 newDirection = Vector2.zero;
@@ -91,9 +85,8 @@ namespace Controllers.EnemyControllers {
             return newDistance;
         }
 
-        public override IEnumerator PauseMovement(int seconds){
-            MoveDirectionToZero();
-            yield return new WaitForSeconds(seconds);
+        public override IEnumerator PauseMovement(float seconds){
+            yield return base.PauseMovement(seconds);
             FindDirection();
         }
     }

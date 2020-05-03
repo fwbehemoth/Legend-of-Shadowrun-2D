@@ -2,21 +2,29 @@
 using Constants;
 using Controllers.BaseControllers;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Controllers {
     public class PlayerController : BaseCharacterController {
-        public GameObject weaponSlot;
+        public Transform weaponSlot_up;
+        public Transform weaponSlot_right_left;
+        public Transform weaponSlot_down;
         public GameObject weapon;
 
-        // Start is called before the first frame update
+        private Transform weaponSlot;
+        private LayersReference layersReference;
+        private BaseWeaponController weaponController;
+
         void Start() {
             animator = this.GetComponent<Animator>();
             rigidBody = this.GetComponent<Rigidbody2D>();
             Move();
-            weapon.transform.position = weaponSlot.transform.position;
+            weaponSlot = weaponSlot_down;
+            weaponController = weapon.GetComponent<BaseWeaponController>();
+            weaponController.transform.position = weaponSlot.position;
+            layersReference = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<LayersReference>();
         }
 
-        // Update is called once per frame
         void Update() {
             if(Input.GetButtonDown("Attack") || Input.GetButton("Attack")){
                 weapon.SetActive(true);
@@ -26,26 +34,28 @@ namespace Controllers {
         }
 
         void FixedUpdate() {
+            moveDirection = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
             Move();
+            if (moveDirection == Vector2.down){
+                weaponSlot = weaponSlot_down;
+            } else if (moveDirection == Vector2.up){
+                weaponSlot = weaponSlot_up;
+            } else if (moveDirection == Vector2.left || moveDirection == Vector2.right){
+                weaponSlot = weaponSlot_right_left;
+            }
+            weaponController.transform.position = weaponSlot.position;
         }
 
         public override void Move(){
             if(!tookDamage) {
-                weapon.transform.position = weaponSlot.transform.position;
-                moveDirection = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-//                rigidBody.velocity = moveDirection * moveSpeed;
-                Vector2 thisPoisiton = transform.position;
-                transform.position = thisPoisiton + (moveDirection * moveSpeed) * Time.deltaTime;
-//                rigidBody.MovePosition(thisPoisiton + (moveDirection * moveSpeed) * Time.deltaTime);
-//
+                rigidBody.velocity = moveDirection * moveSpeed;
+
                 if (moveDirection != Vector2.zero) {
                     animator.SetFloat("Horizontal", moveDirection.x);
                     animator.SetFloat("Vertical", moveDirection.y);
                     weapon.transform.rotation = Quaternion.LookRotation(Vector3.back, moveDirection);
                 }
                 animator.SetFloat("Speed", moveDirection.magnitude);
-            } else {
-//                rigidBody.MovePosition(moveToPosition + damageVelocity * Time.deltaTime);
             }
         }
 
@@ -53,23 +63,22 @@ namespace Controllers {
 
         }
 
-        public override void TakeDamage(int damage, Vector2 dealerMoveDirection) {
-//            base.TakeDamage(damage, dealerMoveDirection);
-            hitPoints -= damage;
-            tookDamage = true;
-//            Debug.Log("Dealer Move Direction: " + dealerMoveDirection);
-//            damageVelocity = dealerMoveDirection;
-//            Debug.Log(this + "-Damage Velocity = " + damageVelocity);
-//            Vector2 thisPoisiton = transform.position;
-//            moveToPosition = thisPoisiton + (dealerMoveDirection * 5);
+//        void OnDrawGizmosSelected(){
+//            if(weaponController == null) return;
+//            Gizmos.DrawWireCube(weaponController.transform.position, weaponController.attackRange);
+//        }
 
-//            damageVelocity = dealerMoveDirection;
-//            Debug.Log(this + "-Damage Velocity = " + damageVelocity);
-//            rigidBody.AddForce(damageVelocity, ForceMode2D.Impulse);
-            StartCoroutine(PauseMovement(2));
+        public override void TakeDamage(int damage, Vector2 attackDirection) {
+            hitPoints -= damage;
+            if(hitPoints <= 0){
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            } else {
+                tookDamage = true;
+                StartCoroutine(PauseMovement(0.5f));
+            }
         }
 
-        public override IEnumerator PauseMovement(int seconds) {
+        public override IEnumerator PauseMovement(float seconds) {
 //            MoveDirectionToZero();
             yield return new WaitForSeconds(seconds);
             tookDamage = false;
@@ -90,7 +99,7 @@ namespace Controllers {
         void OnCollisionEnter2D(Collision2D collision) {
             Debug.Log(this.ToString() + "-collision: " + collision.gameObject.name + "/tag:" + collision.gameObject.tag);
             if(collision.gameObject.tag == TagConstants.BOUNDARIES){
-                moveDirection = Vector2.zero;
+                MoveDirectionToZero();
             }
         }
 

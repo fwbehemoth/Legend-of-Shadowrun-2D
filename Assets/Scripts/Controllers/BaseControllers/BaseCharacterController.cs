@@ -1,4 +1,5 @@
 using System.Collections;
+using Constants;
 using UnityEngine;
 
 namespace Controllers.BaseControllers {
@@ -13,28 +14,49 @@ namespace Controllers.BaseControllers {
         protected Vector2 damageVelocity;
         protected Vector2 moveToPosition;
 
-        public virtual void TakeDamage(int damage, Vector2 dealerMoveDirection){
-//            hitPoints -= damage;
-//            tookDamage = true;
-//            damageVelocity = dealerMoveDirection * 20;
-//            Debug.Log(this + "-Damage Velocity = " + damageVelocity);
-//            rigidBody.AddForce(damageVelocity, ForceMode2D.Impulse);
-        }
+        public virtual void TakeDamage(int damage, Vector2 attackDirection){}
 
         public virtual void Move(){}
 
         public virtual void FindDirection(){}
 
-        public virtual IEnumerator PauseMovement(int seconds){
-            yield return new WaitForSeconds(seconds);
+        public virtual IEnumerator PauseMovement(float seconds){
             MoveDirectionToZero();
+            yield return new WaitForSeconds(seconds);
         }
 
-        public void MoveDirectionToZero(){
-//            rigidBody.velocity = Vector2.zero;
-//            rigidBody.angularVelocity = 0;
+        public virtual void MoveDirectionToZero(){
+            rigidBody.velocity = Vector2.zero;
+            rigidBody.angularVelocity = 0;
             animator.SetFloat("Speed", 0);
             moveDirection = Vector2.zero;
         }
+
+//        void OnTriggerEnter2D(Collider2D collider) {
+//            Debug.Log(this.ToString() + "-collider-enter: " + collider.gameObject.name);
+//        }
+
+//        void OnTriggerStay2D(Collider2D collider) {
+//            Debug.Log(this.ToString() + "-collider-stay: " + collider.gameObject.name);
+//        }
+
+//        void OnTriggerExit2D(Collider2D collider) {
+//            Debug.Log(this.ToString() + "-collider-exit: " + collider.gameObject.name);
+//        }
+
+        void OnCollisionEnter2D(Collision2D collision) {
+            Debug.Log(this.ToString() + "-collision: " + collision.gameObject.name + "/tag:" + collision.gameObject.tag);
+            if(collision.gameObject.tag == TagConstants.BOUNDARIES && tookDamage){
+                MoveDirectionToZero();
+            }
+        }
+
+//        void OnCollisionStay2D(Collision2D collision) {
+//            Debug.Log(this.ToString() + "-collision-stay: " + collision.gameObject.name + "/tag:" + collision.gameObject.tag);
+//        }
+
+//        void OnCollisionExit2D(Collision2D hit) {
+//            Debug.Log(this.ToString() + "-hit: " + hit.gameObject.name);
+//        }
     }
 }
