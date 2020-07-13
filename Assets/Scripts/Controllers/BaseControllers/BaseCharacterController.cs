@@ -7,14 +7,20 @@ namespace Controllers.BaseControllers {
         public float moveSpeed = 5f;
         public int hitPoints = 1;
         public bool tookDamage = false;
+        public bool isPushBack = false;
+        public Vector2 moveDirection;
 
         protected Animator animator;
         protected Rigidbody2D rigidBody;
-        protected Vector2 moveDirection;
-        protected Vector2 damageVelocity;
         protected Vector2 moveToPosition;
+        protected Vector2 directionFacing;
+        protected Vector2 attackDirection;
+        protected bool canCastSpell = true;
+        protected int toBeKnockbacked;
 
-        public virtual void TakeDamage(int damage, Vector2 attackDirection){}
+        public virtual void TakeDamage(int damage, Vector2 attackDirection, int toBeKnockbacked){}
+
+        public virtual void PushBack(Vector2 moveDirection, int toBeKnockbacked){}
 
         public virtual void Move(){}
 
@@ -22,6 +28,10 @@ namespace Controllers.BaseControllers {
 
         public virtual IEnumerator PauseMovement(float seconds){
             MoveDirectionToZero();
+            yield return new WaitForSeconds(seconds);
+        }
+
+        public virtual IEnumerator TempInvincibility(float seconds){
             yield return new WaitForSeconds(seconds);
         }
 

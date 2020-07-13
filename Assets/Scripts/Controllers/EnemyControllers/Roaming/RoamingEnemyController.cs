@@ -1,20 +1,22 @@
 using System.Collections;
 using UnityEngine;
+using Utilities;
 
-namespace Controllers.EnemyControllers {
+namespace Controllers.EnemyControllers.Roaming {
     public class RoamingEnemyController : EnemyController {
+        protected Vector2 lastPosition;
+        protected Vector2 finalPosition;
+
         public float boundariesDistance = 5f;
 
-        Vector2 boundaryVector;
-        Vector2 originPosition;
-        Vector2 lastPosition;
-        Vector2 finalPosition;
-
-        bool isStopped = false;
+        protected Vector2 boundaryVector;
+        protected Vector2 originPosition;
 
         void Start() {
-            animator = this.GetComponent<Animator>();
+            GameObject sprite = ObjectUtils.FindChildByName(this.gameObject, "Sprite");
+            animator = sprite.GetComponent<Animator>();
             rigidBody = this.GetComponent<Rigidbody2D>();
+
             originPosition = this.transform.position;
             boundaryVector = new Vector2(originPosition.x + boundariesDistance, originPosition.y + boundariesDistance);
             FindDirection();
@@ -22,22 +24,29 @@ namespace Controllers.EnemyControllers {
 
         void FixedUpdate() {
             Move();
+
+            if(moveDirection != Vector2.zero){
+                directionFacing = moveDirection;
+            }
         }
 
         public override void Move(){
-            if(!isStopped) {
-                rigidBody.MovePosition(Vector2.MoveTowards(this.gameObject.transform.position, finalPosition, moveSpeed * Time.fixedDeltaTime));
-            }
-
-            if(Vector2.Distance(rigidBody.position, finalPosition) <= 0.1f){
+            if(!tookDamage) {
                 if(!isStopped) {
-                    isStopped = true;
-                    StartCoroutine(PauseMovement(2));
+                    rigidBody.MovePosition(Vector2.MoveTowards(this.gameObject.transform.position, finalPosition, moveSpeed * Time.fixedDeltaTime));
+                }
+                if (Vector2.Distance(rigidBody.position, finalPosition) <= 0.1f) {
+                    if (!isStopped) {
+                        isStopped = true;
+                        StartCoroutine(PauseMovement(2));
+                    }
+                } else {
+                    animator.SetFloat("Horizontal", moveDirection.x);
+                    animator.SetFloat("Vertical", moveDirection.y);
+                    animator.SetFloat("Speed", moveDirection.magnitude);
                 }
             } else {
-                animator.SetFloat("Horizontal", moveDirection.x);
-                animator.SetFloat("Vertical", moveDirection.y);
-                animator.SetFloat("Speed", moveDirection.magnitude);
+                rigidBody.velocity = -attackDirection * toBeKnockbacked;
             }
         }
 

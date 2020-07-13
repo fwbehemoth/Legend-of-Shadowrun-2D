@@ -1,10 +1,10 @@
 using Constants;
 using UnityEngine;
 
-namespace Controllers.EnemyControllers {
-    public class MoveTowardPlayerAggroTrigger : MonoBehaviour {
+namespace Controllers.EnemyControllers.Stationary {
+    public class StationaryMoveTowardsPlayerAggroTrigger : MonoBehaviour {
         public GameObject playerObject;
-        public MoveTowardsPlayerEnemyController enemyController;
+        public EnemyController enemyController;
 
         void OnTriggerExit2D(Collider2D collider) {
             if(collider.gameObject.tag == TagConstants.PLAYER){

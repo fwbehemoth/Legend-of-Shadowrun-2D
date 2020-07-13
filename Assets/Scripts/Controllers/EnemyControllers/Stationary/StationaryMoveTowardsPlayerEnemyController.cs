@@ -3,30 +3,32 @@ using Constants;
 using UnityEngine;
 using Utilities;
 
-namespace Controllers.EnemyControllers {
-    public class MoveTowardsPlayerEnemyController : EnemyController  {
+namespace Controllers.EnemyControllers.Stationary {
+    public class StationaryMoveTowardsPlayerEnemyController : StationaryEnemyController  {
         public float aggroDistance = 5f;
         public GameObject playerObject;
 
         Vector2 lastPosition;
-        Vector2 playerPosition;
-        GameObject aggroTriggerObject;
+
+        public bool aggro = false;
+        protected GameObject aggroTriggerObject;
 
         void Start(){
-            animator = this.GetComponent<Animator>();
+            GameObject sprite = ObjectUtils.FindChildByName(this.gameObject, "Sprite");
+            animator = sprite.GetComponent<Animator>();
             rigidBody = this.GetComponent<Rigidbody2D>();
 
             aggroTriggerObject = new GameObject();
             aggroTriggerObject.name = this.name + "-bounds";
             aggroTriggerObject.AddComponent<BoxCollider2D>();
-            aggroTriggerObject.AddComponent<MoveTowardPlayerAggroTrigger>();
+            aggroTriggerObject.AddComponent<StationaryMoveTowardsPlayerAggroTrigger>();
             aggroTriggerObject.tag = TagConstants.BOUNDARIES;
 
             BoxCollider2D boxCollider = aggroTriggerObject.GetComponent<BoxCollider2D>();
             boxCollider.isTrigger = true;
             boxCollider.size = new Vector2(aggroDistance, aggroDistance);
 
-            MoveTowardPlayerAggroTrigger trigger = aggroTriggerObject.GetComponent<MoveTowardPlayerAggroTrigger>();
+            StationaryMoveTowardsPlayerAggroTrigger trigger = aggroTriggerObject.GetComponent<StationaryMoveTowardsPlayerAggroTrigger>();
             trigger.playerObject = playerObject;
             trigger.enemyController = this;
 
@@ -38,6 +40,9 @@ namespace Controllers.EnemyControllers {
 
         void Update(){
             playerPosition = new Vector2(playerObject.transform.position.x, playerObject.transform.position.y);
+            if(tookDamage) {
+                rigidBody.velocity = -attackDirection * toBeKnockbacked;
+            }
         }
 
         public override void Move(){
@@ -47,24 +52,9 @@ namespace Controllers.EnemyControllers {
             }
         }
 
-        public void CheckDirection(){
-            Vector2 currentPosition = this.gameObject.transform.position;
-            moveDirection = AngleUtility.FindDirectionBetween2Points(playerPosition, currentPosition);
-
-            if (moveDirection != Vector2.zero) {
-                animator.SetFloat("Horizontal", moveDirection.x);
-                animator.SetFloat("Vertical", moveDirection.y);
-            }
-        }
-
         public override IEnumerator PauseMovement(float seconds){
             yield return base.PauseMovement(seconds);
             aggroTriggerObject.SetActive(true);
-        }
-
-        public override void TakeDamage(int damage, Vector2 attackDirection){
-            base.TakeDamage(damage, attackDirection);
-            StartCoroutine(PauseMovement(0.5f));
         }
 
         public override void MoveDirectionToZero(){
@@ -74,12 +64,11 @@ namespace Controllers.EnemyControllers {
 
         void OnCollisionEnter2D(Collision2D collision) {
             if(collision.gameObject.tag == TagConstants.PLAYER){
-                MoveDirectionToZero();
                 PlayerController playerController = collision.gameObject.GetComponent<PlayerController>();
-                playerController.TakeDamage(contactDamage, Vector2.zero);
-                StartCoroutine(PauseMovement(0.5f));
-            } else if(collision.gameObject.tag == TagConstants.BOUNDARIES && tookDamage){
+                playerController.TakeDamage(contactDamage, AngleUtility.FindDirectionBetween2Points(this.transform.position, playerController.transform.position), knockbackAmount);
+            } else if(collision.gameObject.tag == TagConstants.BOUNDARIES){
                 MoveDirectionToZero();
+                StartCoroutine(PauseMovement(0.5f));
             }
         }
     }

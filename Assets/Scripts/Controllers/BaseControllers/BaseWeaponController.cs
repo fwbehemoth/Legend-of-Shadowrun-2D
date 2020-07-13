@@ -2,15 +2,18 @@ using Constants;
 using Controllers.EnemyControllers;
 using UnityEngine;
 using Utilities;
+using Controllers.EnemyControllers.Stationary;
+using Controllers.EnemyControllers;
 
 namespace Controllers.BaseControllers {
     public class BaseWeaponController : MonoBehaviour{
         public int damage = 1;
-        public Vector2 attackRange = new Vector2(1, 1);
+        public int knockbackAmount = 10;
+//        public Vector2 attackRange = new Vector2(1, 1);
         public GameObject playerGameobject;
 
         void Start(){
-            Physics2D.IgnoreLayerCollision(10,11, true);
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer(LayerConstants.PLAYER),LayerMask.NameToLayer(LayerConstants.WEAPONS), true);
         }
 
         void FixedUpdate() {
@@ -36,9 +39,12 @@ namespace Controllers.BaseControllers {
 
             if(collision.gameObject.tag == TagConstants.ENEMY){
                 EnemyController enemyController = collision.gameObject.GetComponent<EnemyController>();
-                Vector2 attackDirection = AngleUtility.FindDirectionBetween2Points(collision.gameObject.transform.position, playerGameobject.transform.position);
-                Debug.Log(this + ": Attack Direction = " + attackDirection);
-                enemyController.TakeDamage(damage, attackDirection);
+                Vector2 attackDirection = AngleUtility.FindDirectionBetween2Points(playerGameobject.transform.position, collision.gameObject.transform.position);
+                if(enemyController.isStopped && enemyController.hasShield){
+                    playerGameobject.GetComponent<PlayerController>().PushBack(attackDirection, enemyController.clangBack);
+                } else {
+                    enemyController.TakeDamage(damage, attackDirection, knockbackAmount);
+                }
             }
         }
 
